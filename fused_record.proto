@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package fieldsense;
+
+message FusedRecord {
+  string plot_id = 1;
+  string event_ts = 2;
+  repeated float embedding = 3;
+  float vwc = 4;
+  float ph = 5;
+  float fusion_gap_ms = 6;
+}
+
+message PredictionRequest {
+  FusedRecord record = 1;
+}
+
+message PredictionResponse {
+  string action = 1;
+  float confidence = 2;
+  float entropy = 3;
+  float latency_ms = 4;
+} 

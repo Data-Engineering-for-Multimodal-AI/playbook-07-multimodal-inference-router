@@ -1,0 +1,6 @@
+numpy>=1.20.0
+tqdm>=4.62.0
+protobuf>=3.19.0
+apache-airflow>=3.0.0
+grpcio>=1.40.0
+grpcio-tools>=1.40.0 

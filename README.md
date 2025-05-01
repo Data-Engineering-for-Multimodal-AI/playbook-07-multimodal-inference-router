@@ -1,113 +1,86 @@
-# FieldSense Multimodal Inference Router
+# Building a Real-Time Multimodal Inference Router
 
-A real-time multimodal inference pipeline for precision agriculture that processes and fuses drone imagery with soil telemetry data to make field-level decisions.
+This project implements a real-time multimodal inference router for precision agriculture, as described in Chapter 7 of *Data Engineering for Multimodal AI* (2025). The pipeline ingests asynchronous data from drone-mounted cameras and soil sensors, performs windowed temporal fusion, routes records to inference modes, and logs observability signals for drift detection and retraining.
 
-## Project Overview
+## Project Overview and Usage Notes
 
-FieldSense is a multimodal AI system for precision agriculture that ingests asynchronous data streams from drones (image frames) and soil probes (telemetry), aligns them using event-time fusion, and routes the processed data to an inference service for timely agricultural recommendations.
+This playbook delivers a high-fidelity, locally executable prototype of a real-time multimodal inference router. While the implementation is optimized for development and simulation, each section includes an accompanying real-world translation explaining how the same logic would scale across production-grade systems. You are encouraged to treat this project as a working reference architecture, and to study the translation notes in each step to understand how these components deploy in enterprise settings.
 
-## Pipeline Architecture
+## Estimated Time Required
 
-The inference router performs three main stages:
+This is a lightweight project suitable for laptops or dev containers. On a standard machine:
 
-### 1. Preprocessing
-
-- **Drone Imagery**: Simulates 256-dimensional embeddings for drone images
-- **Soil Telemetry**: Normalizes volumetric water content from mV to [0.0, 1.0] scale and converts soil pH voltage from mV to pH scale (5.5-7.5)
-- **Metadata Preservation**: Maintains essential metadata like timestamps and plot identifiers
-
-### 2. Fusion and Routing
-
-- **Windowed Event-Time Fusion**: Joins records from different sensors when they share the same plot_id and their timestamps are within ±500ms
-- **Fusion Gap Tracking**: Computes the time difference between matched records for quality assessment
-- **Dual-Path Routing**:
-  - Fused records (sensor fusion < 500ms) → inference_queue_per_event
-  - Vision-only records (no matching soil data) → inference_queue_vision_only
-
-### 3. Inference Simulation
-
-- **Protocol Buffer Serialization**: Converts fused records to a standardized message format
-- **Mock Inference Service**: Simulates prediction latency, confidence scores, and agricultural actions
-- **Observability**: Logs comprehensive metrics including total latency, server latency, and prediction entropy
-
-### 4. DAG Orchestration
-
-- **Airflow Integration**: Formalizes task dependencies using Apache Airflow
-- **Pipeline Automation**: Enables scheduled or manually triggered execution
-- **Maintainable Workflow**: Clearly defined stages with proper dependency management
-
-## Pipeline Data Flow
-
-```
-Raw Data → Preprocessing → Fusion & Routing → Inference → Results
-  ↓             ↓               ↓                ↓           ↓
-Drone Images   Normalized    Event-Time       Protocol     Action
-Soil Readings    Data          Matching       Buffers    Recommendations
-```
+- Setup: ~5 minutes (including installing dependencies)
+- Full pipeline execution (preprocessing → fusion → inference): ~30 seconds to 1 minute
+- No GPU or cloud account required
 
 ## Project Structure
 
-- `preprocess.py`: Normalizes drone image metadata and soil sensor readings
-- `fusion_router.py`: Performs event-time aligned fusion and routing
-- `inference_client.py`: Serializes records and handles inference requests
-- `fused_record.proto`: Protocol Buffer schema for serialization
-- `fieldsense_inference_dag.py`: Airflow DAG for workflow orchestration
-
-## Usage
-
-### Prerequisites
-
-- Python 3.8+
-- Apache Airflow 3.0.0+
-- Protocol Buffers compiler (protoc)
-
-### Setup
-
-1. Clone the repository:
-   ```
-   git clone https://github.com/yourusername/fieldsense-inference-router.git
-   cd fieldsense-inference-router
-   ```
-
-2. Install dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
-
-3. Generate Python bindings from Protocol Buffer schema:
-   ```
-   protoc -I. --python_out=. fused_record.proto
-   ```
-
-### Running the Pipeline
-
-#### Using Airflow
-
-1. Copy the DAG file to your Airflow DAGs directory:
-   ```
-   cp fieldsense_inference_dag.py ~/airflow/dags/
-   ```
-
-2. Trigger the DAG via Airflow UI or CLI:
-   ```
-   airflow dags trigger fieldsense_inference_router
-   ```
-
-#### Manual Execution
-
-Run each component separately:
-
 ```
+preprocess.py                # Normalizes raw drone and soil sensor data
+fusion_router.py             # Performs event-time windowed fusion and routing
+inference_client.py          # Serializes fused records, simulates gRPC inference
+fused_record.proto           # Protobuf schema for fused records and prediction responses
+fieldsense_inference_dag.py  # Airflow DAG orchestrating the pipeline
+raw-data/                    # Raw input files (droneImageMetadata.jsonl, soilSensorReadings.jsonl)
+normalized/                  # Preprocessed sensor and image embedding data
+output/                      # Fused records, vision-only queue, and inference results
+```
+
+## Prerequisites
+
+To run the project locally, you'll need:
+
+- Python 3.8 or newer
+- pip or conda (for dependency management)
+- [Apache Airflow](https://airflow.apache.org/) (optional, for DAG orchestration)
+- numpy, tqdm, grpcio, protobuf, grpcio-tools
+
+Install dependencies using:
+
+```bash
+pip install -r requirements.txt
+```
+
+Or install manually:
+
+```bash
+pip install numpy tqdm grpcio grpcio-tools protobuf
+```
+
+## Pipeline Overview
+
+The inference router performs three stages:
+
+1. **Preprocessing**: Extracts and normalizes volumetric water content and pH from soil telemetry, and simulates 256-dimensional embeddings for drone images.
+
+2. **Fusion and Routing**: Performs windowed event-time fusion between vision and soil streams, routes matched records to an inference queue and unmatched ones to a fallback path.
+
+3. **Inference Simulation**: Serializes fused records into Protobuf messages, simulates prediction latency, entropy, and action decisions, and logs observability data including confidence scores and total latency.
+
+4. **DAG Orchestration**: The Airflow DAG formalizes task dependencies and enables scheduled or triggered execution of the full pipeline.
+
+## Running the Project
+
+To execute the full pipeline manually:
+
+```bash
 python preprocess.py
 python fusion_router.py
 python inference_client.py
 ```
 
+To run the pipeline via Airflow:
+- Place `fieldsense_inference_dag.py` in your Airflow DAGs directory
+- Use the Airflow UI or CLI to trigger execution
+- Logs and task states will be visible via the Airflow webserver
+
 ## License
 
 MIT License
 
-Copyright (c) 2025 Data Engineering for Multimodal AI
+Copyright (c) 2025  
+*Data Engineering for Multimodal AI*
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

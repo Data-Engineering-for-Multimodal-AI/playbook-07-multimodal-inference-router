@@ -24,12 +24,14 @@ class MockInferenceClient:
         # In a real implementation, this would establish a gRPC channel
         print("Initializing mock inference client...")
     
-    def predict(self, record_proto):
+    def predict(self, payload):
         """
-        Mock prediction method that simulates server latency and returns a fixed response
+        Mock prediction method that simulates server latency and returns a random response.
+        The response does not depend on the input; a real server would deserialize the
+        payload and run a model.
         
         Args:
-            record_proto: Serialized FusedRecord protobuf
+            payload: Serialized FusedRecord protobuf (bytes), as it would go over gRPC
             
         Returns:
             dict: A dictionary containing prediction results
@@ -150,7 +152,7 @@ def main():
                     }
                 else:
                     # Make prediction request
-                    prediction = client.predict(record_proto)
+                    prediction = client.predict(record_proto.SerializeToString())
                     
                     # Calculate total processing time
                     end_time = time.time()

@@ -1,0 +1,10 @@
+# Optional: Airflow orchestration for fieldsense_inference_dag.py.
+# Install the core requirements first, then Airflow with its official constraints
+# file for your Python version (3.12 shown; use constraints-3.13.txt on 3.13):
+#
+#   pip install -r requirements.txt
+#   pip install -r requirements-airflow.txt \
+#     --constraint https://raw.githubusercontent.com/apache/airflow/constraints-3.3.2/constraints-3.12.txt
+#
+# The core pins in requirements.txt match this constraints file, so this install does not change them.
+apache-airflow==3.3.2

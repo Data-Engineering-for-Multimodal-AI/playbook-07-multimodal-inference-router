@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import json
 import os
 import time
@@ -105,6 +106,10 @@ def record_to_proto(record):
         return None
 
 def main():
+    parser = argparse.ArgumentParser(description="Send fused records to the mock inference client")
+    parser.add_argument("--seed", type=int, default=42, help="Random seed for the mock predictions (default: 42)")
+    random.seed(parser.parse_args().seed)
+
     # Initialize client
     client = MockInferenceClient()
     

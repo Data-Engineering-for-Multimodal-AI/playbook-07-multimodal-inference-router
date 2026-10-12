@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import json
 import numpy as np
 import os
@@ -107,6 +108,10 @@ def process_soil_data():
     return records_processed
 
 def main():
+    parser = argparse.ArgumentParser(description="Normalize raw drone and soil data")
+    parser.add_argument("--seed", type=int, default=42, help="Random seed for the simulated embeddings (default: 42)")
+    np.random.seed(parser.parse_args().seed)
+
     print("Starting preprocessing of sensor data...")
     
     # Process drone data

@@ -1,6 +1,8 @@
-numpy>=1.20.0
-tqdm>=4.62.0
-protobuf>=3.19.0
-apache-airflow>=3.0.0
-grpcio>=1.40.0
-grpcio-tools>=1.40.0 
+# Generated from uv.lock by: uv export --format requirements-txt --no-dev --no-hashes --no-emit-project
+# Python >= 3.12. Airflow is optional: see requirements-airflow.txt.
+colorama==0.4.6 ; sys_platform == 'win32'
+grpcio==1.83.1
+numpy==2.5.3
+protobuf==6.33.6
+tqdm==4.70.1
+typing-extensions==4.16.0

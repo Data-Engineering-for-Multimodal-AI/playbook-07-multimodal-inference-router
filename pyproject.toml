@@ -1,0 +1,38 @@
+[project]
+name = "playbook-07-multimodal-inference-router"
+version = "2026.10"
+description = "FieldSense: a real-time multimodal inference router (Data Engineering for Multimodal AI, Chapter 7)"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.12"
+dependencies = [
+    "grpcio>=1.81",     # fused_record_pb2_grpc.py is generated with grpcio-tools 1.81.1
+    "numpy>=2.0",
+    "protobuf>=6.31,<7",
+    "tqdm>=4.66",
+]
+
+[project.optional-dependencies]
+# Optional orchestration. With pip, install it using Airflow's constraints file
+# (see requirements-airflow.txt).
+airflow = ["apache-airflow==3.3.2"]
+
+[dependency-groups]
+dev = [
+    "grpcio-tools==1.81.1",  # regenerate stubs: make proto (same pin as Airflow 3.3.2 constraints)
+    "pytest>=8",
+]
+
+[tool.uv]
+package = false
+# Keep core pins inside Airflow 3.3.2's constraints file, so installing the
+# optional Airflow extra never changes them.
+constraint-dependencies = [
+    "grpcio==1.83.1",
+    "numpy==2.5.3",
+    "protobuf==6.33.6",
+    "tqdm==4.70.1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import json
 import os
 import time
@@ -23,12 +24,14 @@ class MockInferenceClient:
         # In a real implementation, this would establish a gRPC channel
         print("Initializing mock inference client...")
     
-    def predict(self, record_proto):
+    def predict(self, payload):
         """
-        Mock prediction method that simulates server latency and returns a fixed response
+        Mock prediction method that simulates server latency and returns a random response.
+        The response does not depend on the input; a real server would deserialize the
+        payload and run a model.
         
         Args:
-            record_proto: Serialized FusedRecord protobuf
+            payload: Serialized FusedRecord protobuf (bytes), as it would go over gRPC
             
         Returns:
             dict: A dictionary containing prediction results
@@ -105,6 +108,10 @@ def record_to_proto(record):
         return None
 
 def main():
+    parser = argparse.ArgumentParser(description="Send fused records to the mock inference client")
+    parser.add_argument("--seed", type=int, default=42, help="Random seed for the mock predictions (default: 42)")
+    random.seed(parser.parse_args().seed)
+
     # Initialize client
     client = MockInferenceClient()
     
@@ -145,7 +152,7 @@ def main():
                     }
                 else:
                     # Make prediction request
-                    prediction = client.predict(record_proto)
+                    prediction = client.predict(record_proto.SerializeToString())
                     
                     # Calculate total processing time
                     end_time = time.time()

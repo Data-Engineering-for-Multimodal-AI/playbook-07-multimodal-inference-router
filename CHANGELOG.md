@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026.10.1 (2026-10-27)
+
+Checked against the book (Early Release, pages 260–271).
+
+### Fixed
+- The book's `python -m grpc_tools.protoc ...` (page 268) failed after `pip install -r
+  requirements.txt`: the 2026.10 update had moved `grpcio-tools` to the development dependencies. It
+  is back in `requirements.txt` (1.81.1, the version the stubs were generated with). CI runs it and
+  checks the stubs come out unchanged.
+
+### Changed
+- README: page numbers; the protoc command; book pages in the differences table.
+
 ## 2026.10 (2026-10-12): 2026 maintenance update
 
 The printed version is tagged `first-edition`.

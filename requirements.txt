@@ -2,7 +2,9 @@
 # Python >= 3.12. Airflow is optional: see requirements-airflow.txt.
 colorama==0.4.6 ; sys_platform == 'win32'
 grpcio==1.83.1
+grpcio-tools==1.81.1
 numpy==2.5.3
 protobuf==6.33.6
+setuptools==84.0.0
 tqdm==4.70.1
 typing-extensions==4.16.0

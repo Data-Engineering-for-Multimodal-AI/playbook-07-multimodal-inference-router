@@ -1867,6 +1867,7 @@ version = "2026.10"
 source = { virtual = "." }
 dependencies = [
     { name = "grpcio" },
+    { name = "grpcio-tools" },
     { name = "numpy" },
     { name = "protobuf" },
     { name = "tqdm" },
@@ -1879,7 +1880,6 @@ airflow = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "grpcio-tools" },
     { name = "pytest" },
 ]
 
@@ -1887,6 +1887,7 @@ dev = [
 requires-dist = [
     { name = "apache-airflow", marker = "extra == 'airflow'", specifier = "==3.3.2" },
     { name = "grpcio", specifier = ">=1.81" },
+    { name = "grpcio-tools", specifier = "==1.81.1" },
     { name = "numpy", specifier = ">=2.0" },
     { name = "protobuf", specifier = ">=6.31,<7" },
     { name = "tqdm", specifier = ">=4.66" },
@@ -1894,10 +1895,7 @@ requires-dist = [
 provides-extras = ["airflow"]
 
 [package.metadata.requires-dev]
-dev = [
-    { name = "grpcio-tools", specifier = "==1.81.1" },
-    { name = "pytest", specifier = ">=8" },
-]
+dev = [{ name = "pytest", specifier = ">=8" }]
 
 [[package]]
 name = "pluggy"

@@ -26,6 +26,9 @@ jobs:
           /tmp/pipenv/bin/python preprocess.py
           /tmp/pipenv/bin/python fusion_router.py
           /tmp/pipenv/bin/python inference_client.py
+          # The book's protoc command (page 268) regenerates the committed stubs unchanged
+          /tmp/pipenv/bin/python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. fused_record.proto
+          git diff --exit-code -- fused_record_pb2.py fused_record_pb2_grpc.py
 
   airflow-dag:
     runs-on: ubuntu-latest

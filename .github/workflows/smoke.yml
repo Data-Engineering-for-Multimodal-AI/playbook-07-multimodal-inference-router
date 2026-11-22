@@ -21,8 +21,26 @@ jobs:
       - uses: astral-sh/setup-uv@v10.3.0
       - name: Smoke test
         run: make smoke
-      - name: One-command run
-        run: make run
+      # README "Run it", steps 2-3: make run, make summary
+      - name: Run it, steps 2-3
+        run: |
+          make run | tee /tmp/run.txt
+          grep -q "Records successfully fused: 201 (20.1%)" /tmp/run.txt
+          make summary | tee /tmp/summary.txt
+          grep -q "Drone frames: 1000. Fused with soil: 201 (20.1%). Vision-only: 799." /tmp/summary.txt
+          grep -q "Actions: fertilize 37, harvest 46, irrigate 40, monitor 42, spray 36" /tmp/summary.txt
+      - name: Use your own data (file checks)
+        run: |
+          uv run --frozen pytest -q tests/test_own_data.py
+          make check-data DIR="raw data" | tee /tmp/check.txt
+          grep -q "All records passed the checks." /tmp/check.txt
+      - name: Try this 1, 2 and 3
+        run: |
+          make try-window | tee /tmp/t1.txt
+          grep -q "5000 ms    883   88.3%" /tmp/t1.txt
+          make try-skew | tee /tmp/t2.txt
+          grep -q "+1000 ms    162   16.2%                       1               161" /tmp/t2.txt
+          make try-scale
       - name: Printed install path (pip install -r requirements.txt)
         run: |
           uv venv --seed --python ${{ matrix.python-version }} /tmp/pipenv
@@ -68,4 +86,5 @@ jobs:
         uses: devcontainers/ci@v0.3
         with:
           push: never
-          runCmd: make run
+          # make run, timed from a clean devcontainer
+          runCmd: start=$(date +%s) && make run && echo "Time to first output in a clean devcontainer was $(( $(date +%s) - start )) s"

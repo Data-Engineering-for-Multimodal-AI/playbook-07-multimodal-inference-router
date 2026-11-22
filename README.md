@@ -1,6 +1,6 @@
 # Building a Real-Time Multimodal Inference Router
 
-**Chapter 7 playbook** from *Data Engineering for Multimodal AI* (O'Reilly, 2026), pages 260–271 (Early Release page numbers; they may differ in the final print).
+**Chapter 7 playbook** from *Data Engineering for Multimodal AI* (O'Reilly, 2026), pages 256–267.
 Book: https://oreil.ly/data-engineering-multimodal
 
 > Want the code exactly as printed? Use the `first-edition` tag. This branch is the 2026 maintenance update; see [Differences from the printed book](#differences-from-the-printed-book).
@@ -31,7 +31,7 @@ python fusion_router.py
 python inference_client.py
 ```
 
-The book's `python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. fused_record.proto` (page 268) also works; it regenerates the stubs, which are already committed.
+The book's `python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. fused_record.proto` (page 264) also works; it regenerates the stubs, which are already committed.
 
 Using [uv](https://docs.astral.sh/uv/) instead:
 
@@ -81,13 +81,13 @@ With uv: `uv sync --extra airflow`.
 | Python 3.12+ (was 3.8+); versions pinned | Current releases; the old stubs failed with the older protobuf and grpcio that the requirements allowed | n/a (first-edition repository) |
 | The DAG runs locally: tasks run from `FIELDSENSE_HOME` instead of `python /opt/fieldsense/...`, and import `BashOperator` from `airflow.providers.standard` | In the first edition, the DAG failed: `/opt/fieldsense` doesn't exist, and the scripts' relative paths broke in Airflow's temp working directory | n/a (first-edition DAG) |
 | `--seed` (default 42) on `preprocess.py` and `inference_client.py` | Embeddings and mock predictions changed on every run | n/a |
-| Protobuf stubs regenerated (`make proto`); `grpcio-tools` pinned in `requirements.txt` | Match the pinned protobuf and grpcio; the protoc command needs `grpcio-tools` | 268 |
+| Protobuf stubs regenerated (`make proto`); `grpcio-tools` pinned in `requirements.txt` | Match the pinned protobuf and grpcio; the protoc command needs `grpcio-tools` | 264 |
 | The mock client receives serialized bytes (`SerializeToString()`) | Matches what the text describes | n/a |
-| README file names corrected: the data folder is `raw data/` (with a space) and the soil file is `soilSensorReading.jsonl` | The old README and the book listed `raw-data/` and `soilSensorReadings.jsonl` | 261 |
+| README file names corrected: the data folder is `raw data/` (with a space) and the soil file is `soilSensorReading.jsonl` | The old README and the book listed `raw-data/` and `soilSensorReadings.jsonl` | 257 |
 
 Notes on the chapter text:
-- The header contract names the key `field_id` (p. 225). The code and the rest of the chapter use `plot_id`.
-- The chapter introduction mentions a frame every 33 ms (p. 221). The sample data and pipeline run at about 2 Hz (a frame about every 500 ms), with soil readings at 1 Hz.
+- The header contract names the key `field_id` (p. 221). The code and the rest of the chapter use `plot_id`.
+- The chapter introduction mentions a frame every 33 ms (p. 217). The sample data and pipeline run at about 2 Hz (a frame about every 500 ms), with soil readings at 1 Hz.
 
 This section is the record of changes since printing. Full list: [CHANGELOG.md](CHANGELOG.md).
 

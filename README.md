@@ -129,7 +129,7 @@ copies  frames soil readings  fused fusion_router.py binary search
     16  16,000        15,312  3,216           63.69s        0.581s
 ```
 
-Sixteen copies are about 2 hours of drone frames; the pipeline's fusion took a minute on them, against well under a second for the binary search. The work grows with the square of the stream length. The Mac was busy, so times varied between runs (another run took 30.6 s for 16 copies). Pass other sizes with `make try-scale TIMES="1 2 8"`.
+Sixteen copies are about 2 hours of drone frames; the pipeline's fusion took a minute on them, against well under a second for the binary search. The work grows with the square of the stream length. The Mac was busy, so times varied between runs (another run took 30.6 s for 16 copies); in CI (ubuntu-latest, Python 3.13) 16 copies took 13.15 s against 0.017 s. Pass other sizes with `make try-scale TIMES="1 2 8"`.
 
 ## Use your own data
 
@@ -214,7 +214,7 @@ This playbook runs on 8 minutes of synthetic data with a mock model. Before you 
 | Where you run it | Cost |
 |---|---|
 | Your machine | $0. Everything runs locally: no API keys, no paid services. About 100 MB of disk, most of it the Python environment. |
-| A GitHub Codespace (2 cores, 8 GB, the default size; the repo asks for nothing larger) | Estimated $0.18 per hour at GitHub's list price (November 2026). A free personal account includes 120 core-hours a month, about 60 hours on this machine. |
+| A GitHub Codespace (2 cores, 8 GB, the default size; the repo asks for nothing larger) | Estimated $0.18 per hour at GitHub's list price (November 2026). A free personal account includes 120 core-hours a month, about 60 hours on this machine. In CI, `make run` took 13 s in a freshly built devcontainer. |
 
 ## How it works
 

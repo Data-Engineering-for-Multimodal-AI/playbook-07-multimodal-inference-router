@@ -1,5 +1,8 @@
 .PHONY: setup run smoke proto clean
 
+# A bare `make` runs the smoke test, as it did before the uniform targets were added.
+.DEFAULT_GOAL := smoke
+
 # Uniform targets for The Playbooks. The book's commands (pip install -r requirements.txt,
 # python preprocess.py, python fusion_router.py, python inference_client.py and
 # python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. fused_record.proto)

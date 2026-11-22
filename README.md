@@ -1,7 +1,11 @@
-# Building a Real-Time Multimodal Inference Router
+# Playbook 07: Route drone and soil streams to real-time inference
+**How to build a real-time multimodal inference router.** Chapter 7 of [*Data Engineering for Multimodal AI*](https://oreil.ly/data-engineering-multimodal) (O'Reilly, 2026), pages 256–267.
 
-**Chapter 7 playbook** from *Data Engineering for Multimodal AI* (O'Reilly, 2026), pages 256–267.
-Book: https://oreil.ly/data-engineering-multimodal
+Drone images and soil sensors report on different clocks, but a decision to spray or irrigate has to use both within seconds. In this repo, we explore this with FieldSense, a fictional precision agriculture company. Follow along to align the two streams by event time, route each record to the right inference path, fall back when it falls behind, and log latency and drift, all on a laptop.
+
+**The problem.** Two streams with different clocks have to be matched in time and acted on within a latency budget, even when one of them falls behind.
+
+**What you'll work with.** You'll align records by event time in windows, decide per record between immediate and batched inference, fall back when queues grow, and log latency, queue depth and drift.
 
 > Want the code exactly as printed? Use the `first-edition` tag. This branch is the 2026 maintenance update; see [Differences from the printed book](#differences-from-the-printed-book).
 

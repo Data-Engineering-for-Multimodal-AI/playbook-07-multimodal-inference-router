@@ -4,6 +4,8 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 1"   # weekly, Monday 06:00 UTC, so breakage in upstream packages shows up
 
 jobs:
   smoke:
@@ -19,6 +21,26 @@ jobs:
       - uses: astral-sh/setup-uv@v10.3.0
       - name: Smoke test
         run: make smoke
+      # README "Run it", steps 2-3: make run, make summary
+      - name: Run it, steps 2-3
+        run: |
+          make run | tee /tmp/run.txt
+          grep -q "Records successfully fused: 201 (20.1%)" /tmp/run.txt
+          make summary | tee /tmp/summary.txt
+          grep -q "Drone frames: 1000. Fused with soil: 201 (20.1%). Vision-only: 799." /tmp/summary.txt
+          grep -q "Actions: fertilize 37, harvest 46, irrigate 40, monitor 42, spray 36" /tmp/summary.txt
+      - name: Use your own data (file checks)
+        run: |
+          uv run --frozen pytest -q tests/test_own_data.py
+          make check-data DIR="raw data" | tee /tmp/check.txt
+          grep -q "All records passed the checks." /tmp/check.txt
+      - name: Try this 1, 2 and 3
+        run: |
+          make try-window | tee /tmp/t1.txt
+          grep -q "5000 ms    883   88.3%" /tmp/t1.txt
+          make try-skew | tee /tmp/t2.txt
+          grep -q "+1000 ms    162   16.2%                       1               161" /tmp/t2.txt
+          make try-scale
       - name: Printed install path (pip install -r requirements.txt)
         run: |
           uv venv --seed --python ${{ matrix.python-version }} /tmp/pipenv
@@ -26,7 +48,7 @@ jobs:
           /tmp/pipenv/bin/python preprocess.py
           /tmp/pipenv/bin/python fusion_router.py
           /tmp/pipenv/bin/python inference_client.py
-          # The book's protoc command (page 268) regenerates the committed stubs unchanged
+          # The book's protoc command (page 264) regenerates the committed stubs unchanged
           /tmp/pipenv/bin/python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. fused_record.proto
           git diff --exit-code -- fused_record_pb2.py fused_record_pb2_grpc.py
 
@@ -54,3 +76,15 @@ jobs:
           airflow db migrate
           airflow dags test fieldsense_inference_router
           test "$(wc -l < output/inference_results.jsonl)" -eq 201
+
+  devcontainer:
+    # Builds .devcontainer/ the way Codespaces does and runs the playbook inside it.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build the devcontainer and run the playbook
+        uses: devcontainers/ci@v0.3
+        with:
+          push: never
+          # make run, timed from a clean devcontainer
+          runCmd: start=$(date +%s) && make run && echo "Time to first output in a clean devcontainer was $(( $(date +%s) - start )) s"

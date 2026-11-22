@@ -1,5 +1,34 @@
 # Changelog
 
+## Unreleased (v1.1.0)
+
+Nothing the book shows has changed.
+
+### Added
+- `make summary` summarizes a run: fused and vision-only frames, time gaps per plot, and inference
+  latency (`scripts/summarize.py`).
+- `make check-data DIR=...` and `make load DIR=...`: check your own drone and soil streams (the
+  format of `raw data/`) and run the three steps on them in `runs/<folder name>/`
+  (`scripts/load_streams.py`). Tests in `tests/test_own_data.py`.
+- Three measured experiments: `make try-window`, `make try-skew`, `make try-scale` (`experiments/`).
+- README: numbered Run it steps, time tiers, Try this, Use your own data, What you end up with,
+  Before production, What it costs.
+- CI: runs the Run it steps with checks on their output, the three experiments, the own-data
+  tests, and prints the time to first output in a clean devcontainer.
+- `make setup`, `make run` and `make clean`. `make run` runs `preprocess.py`, `fusion_router.py`
+  and `inference_client.py` on the sample data in `raw data/`. `make smoke` and `make proto` are
+  unchanged.
+- `.devcontainer/` so the repo opens in GitHub Codespaces with dependencies installed.
+- CI: a weekly scheduled run, a `make run` step, and a job that builds the devcontainer and runs
+  `make run` inside it.
+
+### Changed
+- README: "What you'll build" is now "How it works"; "Quick start" is now "Run it the way the
+  book does", with its content unchanged. The first-edition note points to it.
+- `make clean` also deletes `runs/`, the output of `make load`.
+- README opening: a title that says what you'll do, three sentences on why, the example and what you'll do, then the data engineering problem and what you'll work with.
+- Book page numbers now match the printed book (they were Early Release page numbers).
+
 ## 2026.10.1 (2026-10-27)
 
 Checked against the book (Early Release, pages 260–271).

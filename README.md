@@ -380,6 +380,8 @@ tests/test_smoke.py          # make smoke
 tests/test_own_data.py       # Checks for scripts/load_streams.py
 ```
 
+If this playbook helped you, a star helps other readers find it.
+
 ## License
 
 MIT License

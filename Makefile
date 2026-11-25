@@ -22,6 +22,7 @@ run: setup
 	uv run --frozen python preprocess.py
 	uv run --frozen python fusion_router.py
 	uv run --frozen python inference_client.py
+	@echo "playbook-07-multimodal-inference-router" > .playbook-done
 
 # After make run (or make load): what was fused, the time gaps, and inference latency.
 #   make summary

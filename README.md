@@ -64,7 +64,7 @@ Per plot:
 Inference (mock): 201 requests, latency p50 63 ms, p95 104 ms, max 163 ms, total 13.3 s.
 ```
 
-Four out of five frames go to the vision-only queue, and nothing reads that queue: `inference_client.py` only sends the fused records. The latencies come from the mock, which sleeps 20 to 100 ms and returns a random action. To see one record, open `output/inference_queue_per_event.jsonl`; each line carries the frame's plot, time, embedding, the soil values and `fusion_gap_ms`.
+Four out of five frames go to the vision-only queue. Run `uv run python inference_client.py --queue vision-only` after routing to send those frames to the mock client. Results go to `output/inference_results_vision_only.jsonl`. The mock uses the same Protobuf message and the soil fields default to zero. The latencies come from the mock, which sleeps 20 to 100 ms and returns a random action. To see one record, open `output/inference_queue_per_event.jsonl`; each line carries the frame's plot, time, embedding, the soil values and `fusion_gap_ms`.
 
 **4. Clean up.**
 
@@ -211,7 +211,7 @@ Skills you'll practice:
 
 This playbook runs on 8 minutes of synthetic data with a mock model. Before you run something like it for real:
 
-1. **Serve the fallback queue.** `fusion_router.py` writes 799 of the 1,000 frames to `inference_queue_vision_only.jsonl`, and nothing reads it: only fused records reach `inference_client.py`. Send vision-only records to a vision-only model, and count them. *Chapter 7, "Inference Routing" (page 224).*
+1. **Serve the fallback queue with a vision-only model.** Use the `--queue vision-only` path with a real vision-only model in place of the mock client, and count its predictions. *Chapter 7, "Inference Routing" (page 224).*
 2. **Size the window from the sensors.** Soil readings arrive about every 4 s per plot, so the 500 ms window fuses 20% of frames; 5 s fuses 88% ([Try this 1](#try-this)). The router also matches readings from after the frame, which in a live stream means waiting for them. Decide how old a reading may be, and whether to wait. *Chapter 7, "Event-Time Alignment" (page 218); Chapter 7, "Windowed Fusion" (page 224).*
 3. **Watch the clocks.** With the soil clocks 1 s off, the fused share barely moves (16% against 20%), but 161 of 162 fused records get the wrong reading ([Try this 2](#try-this)). Track `fusion_gap_ms` per sensor over time, and sync the device clocks. *Chapter 7, "Drift Types, Detection, and Engineering Response" (page 229).*
 4. **Make fusion scale with the stream.** `fuse_and_route_data` compares every frame with every reading of its plot: 63.7 s for 16 copies of the sample against 0.58 s with a sorted lookup ([Try this 3](#try-this)). A streaming join keeps only the recent readings per plot in state. *Chapter 7, "Tuning the Pipeline for Production" (page 227).*

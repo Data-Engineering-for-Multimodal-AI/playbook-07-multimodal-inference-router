@@ -62,6 +62,29 @@ def test_inference_results(first_run):
     assert {r["action"] for r in results} <= {"spray", "irrigate", "fertilize", "monitor", "harvest"}
 
 
+def test_vision_only_queue(tmp_path):
+    output = tmp_path / "output"
+    output.mkdir()
+    record = {"plot_id": "Plot_001", "event_ts": "2025-01-01T00:00:00Z", "embedding": [0.5]}
+    (output / "inference_queue_vision_only.jsonl").write_text(json.dumps(record) + "\n")
+    fused_results = output / "inference_results.jsonl"
+    fused_results.write_text("existing fused results\n")
+
+    result = subprocess.run(
+        [sys.executable, str(ROOT / "inference_client.py"), "--queue", "vision-only"],
+        cwd=tmp_path, capture_output=True, text=True, timeout=30,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    results = (output / "inference_results_vision_only.jsonl").read_text().splitlines()
+    assert len(results) == 1
+    prediction = json.loads(results[0])
+    assert prediction["plot_id"] == record["plot_id"]
+    assert prediction["event_ts"] == record["event_ts"]
+    assert "server_latency_ms" in prediction
+    assert fused_results.read_text() == "existing fused results\n"
+
+
 def test_protobuf_round_trip(first_run):
     sys.path.insert(0, str(ROOT))
     import fused_record_pb2 as pb2

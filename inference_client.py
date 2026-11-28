@@ -11,8 +11,10 @@ import fused_record_pb2_grpc as pb2_grpc
 
 # Input and output paths
 INPUT_FUSED_PATH = "output/inference_queue_per_event.jsonl"
+INPUT_VISION_ONLY_PATH = "output/inference_queue_vision_only.jsonl"
 OUTPUT_DIR = "output"
 OUTPUT_RESULTS_PATH = os.path.join(OUTPUT_DIR, "inference_results.jsonl")
+OUTPUT_VISION_ONLY_RESULTS_PATH = os.path.join(OUTPUT_DIR, "inference_results_vision_only.jsonl")
 
 # Ensure output directory exists
 os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -108,16 +110,26 @@ def record_to_proto(record):
         return None
 
 def main():
-    parser = argparse.ArgumentParser(description="Send fused records to the mock inference client")
+    parser = argparse.ArgumentParser(description="Send queued records to the mock inference client")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for the mock predictions (default: 42)")
-    random.seed(parser.parse_args().seed)
+    parser.add_argument(
+        "--queue", choices=("fused", "vision-only"), default="fused",
+        help="Queue to send to the mock client (default: fused)",
+    )
+    args = parser.parse_args()
+    random.seed(args.seed)
+
+    input_path, output_path = {
+        "fused": (INPUT_FUSED_PATH, OUTPUT_RESULTS_PATH),
+        "vision-only": (INPUT_VISION_ONLY_PATH, OUTPUT_VISION_ONLY_RESULTS_PATH),
+    }[args.queue]
 
     # Initialize client
     client = MockInferenceClient()
     
-    # Read fused records
+    # Read the selected queue
     records = []
-    with open(INPUT_FUSED_PATH, 'r') as f:
+    with open(input_path, 'r') as f:
         for line in f:
             if line.strip():
                 try:
@@ -126,10 +138,10 @@ def main():
                 except json.JSONDecodeError:
                     print(f"Warning: Skipping malformed JSON: {line[:50]}...")
     
-    print(f"Processing {len(records)} fused records...")
+    print(f"Processing {len(records)} {args.queue} records...")
     
     # Process records and write results
-    with open(OUTPUT_RESULTS_PATH, 'w') as out_file:
+    with open(output_path, 'w') as out_file:
         for record in tqdm(records, desc="Sending inference requests"):
             try:
                 # Start timing
@@ -175,7 +187,7 @@ def main():
             except Exception as e:
                 print(f"Error processing record: {e}")
     
-    print(f"Results written to {OUTPUT_RESULTS_PATH}")
+    print(f"Results written to {output_path}")
 
 if __name__ == "__main__":
     main() 
